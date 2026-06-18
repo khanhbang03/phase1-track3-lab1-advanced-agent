@@ -5,13 +5,17 @@ from .utils import normalize_answer
 FIRST_ATTEMPT_WRONG = {"hp2": "London", "hp4": "Atlantic Ocean", "hp6": "Red Sea", "hp8": "Andes"}
 FAILURE_MODE_BY_QID = {"hp2": "incomplete_multi_hop", "hp4": "wrong_final_answer", "hp6": "entity_drift", "hp8": "entity_drift"}
 
+def canonical_qid(qid: str) -> str:
+    return qid.split("__repeat_", 1)[0]
+
 def actor_answer(example: QAExample, attempt_id: int, agent_type: str, reflection_memory: list[str]) -> str:
-    if example.qid not in FIRST_ATTEMPT_WRONG:
+    qid = canonical_qid(example.qid)
+    if qid not in FIRST_ATTEMPT_WRONG:
         return example.gold_answer
     if agent_type == "react":
-        return FIRST_ATTEMPT_WRONG[example.qid]
+        return FIRST_ATTEMPT_WRONG[qid]
     if attempt_id == 1 and not reflection_memory:
-        return FIRST_ATTEMPT_WRONG[example.qid]
+        return FIRST_ATTEMPT_WRONG[qid]
     return example.gold_answer
 
 def evaluator(example: QAExample, answer: str) -> JudgeResult:
@@ -22,5 +26,5 @@ def evaluator(example: QAExample, answer: str) -> JudgeResult:
     return JudgeResult(score=0, reason="The final answer selected the wrong second-hop entity.", missing_evidence=["Need to ground the answer in the second paragraph."], spurious_claims=[answer])
 
 def reflector(example: QAExample, attempt_id: int, judge: JudgeResult) -> ReflectionEntry:
-    strategy = "Do the second hop explicitly: birthplace city -> river through that city." if example.qid == "hp2" else "Verify the final entity against the second paragraph before answering."
+    strategy = "Do the second hop explicitly: birthplace city -> river through that city." if canonical_qid(example.qid) == "hp2" else "Verify the final entity against the second paragraph before answering."
     return ReflectionEntry(attempt_id=attempt_id, failure_reason=judge.reason, lesson="A partial first-hop answer is not enough; the final answer must complete all hops.", next_strategy=strategy)

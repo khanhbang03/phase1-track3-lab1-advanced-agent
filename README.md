@@ -77,6 +77,32 @@ Có thể sử dụng: Ollama, vLLM, OpenAI API, Gemini API, hoặc bất kỳ L
 
 **Yêu cầu tối thiểu:** Chạy benchmark trên ít nhất **100 mẫu** để đạt điểm đầy đủ cho phần Experiment (`autograde.py` kiểm tra `num_records >= 100`).
 
+`run_benchmark.py` mặc định bảo đảm tối thiểu 100 run records (50 mẫu cho mỗi
+agent). Nếu dataset có ít hơn 50 mẫu, script lặp deterministic và ghi rõ
+`source_examples`, `evaluated_examples`, `dataset_repeated` trong metadata.
+Khi chạy thí nghiệm chính thức, nên truyền một dataset có ít nhất 50 câu độc
+lập; dùng `--min-records 2` nếu chỉ muốn smoke test nhanh.
+
+Loader chấp nhận cả schema của lab và schema HotpotQA gốc (`_id`, `answer`,
+`level`, context dạng `[title, sentences]`). Script mặc định lấy tối đa 50 câu;
+có thể đổi bằng `--max-examples`.
+
+### Chạy với LLM thật
+
+Runtime hỗ trợ API chat-completions tương thích OpenAI, gồm cả endpoint hosted
+và local như vLLM:
+
+```bash
+set LLM_MODEL=your-model
+set LLM_API_KEY=your-key
+set LLM_BASE_URL=https://api.openai.com/v1
+python run_benchmark.py --mode llm --dataset data/hotpot_dev_distractor_v1.json
+```
+
+Trong `llm` mode, token count được lấy từ trường `usage.total_tokens` và latency
+được đo quanh từng API call. Trong `mock` mode, code dùng ước lượng ký tự có
+thể tái lập để phục vụ regression test offline.
+
 ### Bước 5: Tính toán Token thực tế
 Thay thế `token_estimate` và `latency_ms` hardcoded trong `agents.py` bằng giá trị thật từ LLM response.
 
