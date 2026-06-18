@@ -7,5 +7,10 @@ ENV/
 env/
 .env
 .pytest_cache/
-outputs/
+outputs/*
+!outputs/hotpot_50/
+outputs/hotpot_50/*
+!outputs/hotpot_50/dashboard.html
+!outputs/hotpot_50/report.json
+!outputs/hotpot_50/report.md
 .DS_Store

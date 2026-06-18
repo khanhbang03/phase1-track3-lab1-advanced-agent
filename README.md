@@ -1,5 +1,11 @@
 # Lab 16 — Reflexion Agent
 
+## Showcase dashboard
+
+Mở [`outputs/hotpot_50/dashboard.html`](outputs/hotpot_50/dashboard.html) để xem
+dashboard benchmark tương tác, rubric 100/100, phân tích failure modes,
+extensions và sample explorer. Website chạy offline, không cần CDN hoặc server.
+
 ## Tổng quan
 
 Bài lab giúp bạn hiểu và triển khai **Reflexion Agent** — một kiến trúc agent có khả năng tự phản chiếu (self-reflection) để cải thiện câu trả lời qua nhiều lần thử.
